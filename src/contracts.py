@@ -10,7 +10,7 @@ class PromptConfig(BaseModel):
     version_id: str
     timestamp: datetime
     system_prompt: str
-    model: str = "gpt-4o-mini"
+    model: str = "llama-3.3-70b-versatile"
     temperature: float = 0.0
 
 class TestCase(BaseModel):

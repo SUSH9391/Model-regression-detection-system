@@ -32,7 +32,9 @@ jobs:
 
       - name: Run Eval Suite
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          LLM_BASE_URL: "https://api.groq.com/openai/v1"
+          LLM_MODEL: "llama-3.3-70b-versatile"
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           BRANCH_NAME: ${{ github.head_ref }}
         run: |

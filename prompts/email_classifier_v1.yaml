@@ -1,6 +1,7 @@
-version_id: "v1.0.0"
+# Provider: Groq (free tier) — https://console.groq.com
+version_id: "v1.1.0-groq"
 timestamp: "2024-01-15T09:00:00Z"
-model: "gpt-4o-mini"
+model: "llama-3.3-70b-versatile"
 temperature: 0.0
 system_prompt: |
   You are an expert AI email classifier. Your task is to analyze incoming user emails and categorize them into one of the following four categories:

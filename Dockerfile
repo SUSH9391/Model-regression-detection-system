@@ -28,7 +28,9 @@ COPY prompts/ /app/prompts/
 RUN mkdir -p /app/reports
 
 # Environment variables placeholders (no hardcoded keys)
-ENV OPENAI_API_KEY=""
+ENV GROQ_API_KEY=""
+ENV LLM_BASE_URL="https://api.groq.com/openai/v1"
+ENV LLM_MODEL="llama-3.3-70b-versatile"
 ENV SLACK_WEBHOOK_URL=""
 
 # Default execution command runs evaluation runner

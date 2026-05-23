@@ -17,29 +17,48 @@ from src.reporter import generate_report
 from src.alerting import send_slack_alert
 
 class EvalEngine:
-    def __init__(self, api_key: str, max_concurrent: int = 10) -> None:
-        self.client = AsyncOpenAI(api_key=api_key)
+    def __init__(self, api_key: str | None = None, max_concurrent: int = 10) -> None:
+        self.client = AsyncOpenAI(
+            api_key=os.getenv("GROQ_API_KEY") or api_key,
+            base_url=os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
+        )
         self.semaphore = asyncio.Semaphore(max_concurrent)
 
     async def evaluate_single_case(self, test_case: TestCase, config: PromptConfig) -> EvalResult:
         async with self.semaphore:
             loop = asyncio.get_event_loop()
             start_time = loop.time()
+            model = config.model or os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
             try:
-                response = await self.client.beta.chat.completions.parse(
-                    model=config.model,
+                response = await self.client.chat.completions.create(
+                    model=model,
                     messages=[
-                        {"role": "system", "content": config.system_prompt},
-                        {"role": "user", "content": test_case.input_text},
+                        {
+                            "role": "system",
+                            "content": config.system_prompt + "\n\nYou MUST respond with valid JSON only. No explanation, no markdown, no code fences. Exactly this format: {\"category\": \"billing|technical|account|general\", \"summary\": \"one sentence summary\"}"
+                        },
+                        {"role": "user", "content": test_case.input_text}
                     ],
                     temperature=config.temperature,
-                    response_format=EmailAnalysis,
+                    max_tokens=200
                 )
                 latency = loop.time() - start_time
-                parsed_output = response.choices[0].message.parsed
+                raw_text = response.choices[0].message.content.strip()
                 
-                if parsed_output is None:
-                    raise ValueError("Failed to parse response structure.")
+                try:
+                    parsed_output = EmailAnalysis.model_validate_json(raw_text)
+                except Exception:
+                    return EvalResult(
+                        test_case_id=test_case.id,
+                        status="failed",
+                        output=None,
+                        error=f"JSON parse error: {raw_text[:100]}",
+                        metrics={
+                            "category_match": 0.0,
+                            "latency": latency,
+                            "tokens_used": response.usage.total_tokens if response.usage else 0
+                        }
+                    )
 
                 category_match = 1.0 if parsed_output.category == test_case.expected_category else 0.0
                 tokens_used = response.usage.total_tokens if response.usage else 0
@@ -89,9 +108,9 @@ class EvalEngine:
 
 async def main() -> None:
     # 1. Load configuration and dataset paths
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        print("Warning: OPENAI_API_KEY environment variable is not set. Real API calls will fail.")
+        print("Warning: GROQ_API_KEY environment variable is not set. Real API calls will fail.")
         # We still allow execution so GHA workflows or mock tests run without immediately crashing on load
         api_key = "dummy-key"
 
