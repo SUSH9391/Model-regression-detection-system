@@ -1,0 +1,107 @@
+[
+  {
+    "id": "billing_01",
+    "input_text": "Hello, I received my monthly invoice #10293 but I was charged twice. Can you please process a refund for the second transaction?",
+    "expected_category": "billing",
+    "expected_difficulty": "easy",
+    "notes": "Clear request for billing refund with invoice number."
+  },
+  {
+    "id": "billing_02",
+    "input_text": "hey i got billed twice on my card for the subscripton... can u check my recipt or invice? the charge code is TXN-9938. pls fix dis asap.",
+    "expected_category": "billing",
+    "expected_difficulty": "medium",
+    "notes": "Typo-heavy billing inquiry with slang and abbreviations."
+  },
+  {
+    "id": "billing_03",
+    "input_text": "My subscription has expired and I cannot access my profile, but I wanted to check if there is an outstanding balance that caused the account lock.",
+    "expected_category": "billing",
+    "expected_difficulty": "hard",
+    "notes": "Ambiguous. Mentions profile access lock (account issue) but asks about outstanding balance (billing)."
+  },
+  {
+    "id": "billing_04",
+    "input_text": "Wow, I absolutely love being charged for a service I cancelled two months ago. It is truly a delightful surprise on my bank statement. Please return my money.",
+    "expected_category": "billing",
+    "expected_difficulty": "medium",
+    "notes": "Sarcastic complaint about an incorrect charge after cancellation."
+  },
+  {
+    "id": "tech_01",
+    "input_text": "Hi support, I am getting a database connection error (code 500) whenever I try to fetch user records on the dashboard. Can you check if the servers are down?",
+    "expected_category": "technical",
+    "expected_difficulty": "easy",
+    "notes": "Straightforward technical support request regarding database error."
+  },
+  {
+    "id": "tech_02",
+    "input_text": "Hola, I tried to update the app on my phone but it says 'el archivo está dañado' and crashes during launch. Can you help me reinstall it?",
+    "expected_category": "technical",
+    "expected_difficulty": "medium",
+    "notes": "Technical issue written in code-switched English and Spanish."
+  },
+  {
+    "id": "tech_03",
+    "input_text": "API returns error 403 on login endpoint",
+    "expected_category": "technical",
+    "expected_difficulty": "medium",
+    "notes": "Extremely short 8-word technical report without standard greeting."
+  },
+  {
+    "id": "tech_04",
+    "input_text": "Your platform looks nice, but I noticed the main navigation bar is overlapping with the sidebar. Is there a settings menu to change the layout?",
+    "expected_category": "technical",
+    "expected_difficulty": "hard",
+    "notes": "Ambiguous. UI feedback/navigation query (could be general feedback or settings help) vs a layout rendering bug (technical)."
+  },
+  {
+    "id": "account_01",
+    "input_text": "Hello, I forgot my password and need to reset my registered email address. Can you send a verification link to my new email?",
+    "expected_category": "account",
+    "expected_difficulty": "easy",
+    "notes": "Standard account management request for password and email reset."
+  },
+  {
+    "id": "account_02",
+    "input_text": "I have been trying to log in for three hours and your verification system is complete garbage! I'm locked out and this is halting my entire team's workflow. Unlock my profile right now!",
+    "expected_category": "account",
+    "expected_difficulty": "medium",
+    "notes": "Highly angry customer locked out of their account demanding immediate resolution."
+  },
+  {
+    "id": "account_03",
+    "input_text": "I want to delete my account and purge all my personal data, but I need to make sure my credit card details are completely removed from your systems first.",
+    "expected_category": "account",
+    "expected_difficulty": "hard",
+    "notes": "Ambiguous. Request to delete profile (account) combined with removing payment methods/card details (billing)."
+  },
+  {
+    "id": "account_04",
+    "input_text": "I checked my settings page and things seem different today. I don't see what I usually see. Can you fix this?",
+    "expected_category": "account",
+    "expected_difficulty": "hard",
+    "notes": "Vague user request referencing general UI/settings differences, likely related to account profile views but lacks specific indicators."
+  },
+  {
+    "id": "general_01",
+    "input_text": "Hi there, I am a student doing a research project on SaaS platforms. Could you tell me more about your company's founding history and mission?",
+    "expected_category": "general",
+    "expected_difficulty": "easy",
+    "notes": "General inquiry about company history, no account/tech/billing requests."
+  },
+  {
+    "id": "general_02",
+    "input_text": "Hey team! Just wanted to send some good vibes today 😎 and say your product has saved me tons of time! Keep rocking 🚀✨",
+    "expected_category": "general",
+    "expected_difficulty": "medium",
+    "notes": "Informal feedback/appreciation email filled with emojis, categorized as general."
+  },
+  {
+    "id": "general_03",
+    "input_text": "Dear support team,\n\nI am writing to you on behalf of our local community organization. We have been looking at various tools on the market to organize our annual events. During our last board meeting, several members suggested we look into your tool, while others suggested other tools. I am the coordinator for this project, and I've been tasked with compiling a comparison spreadsheet of different platforms. \n\nI wanted to ask if you have any PDF brochures or whitepapers that outline your security compliance, company history, and team structures so I can share them with the board. We are not yet ready to open an account or discuss pricing, as we are in the early informational phase.\n\nThank you for your time and assistance.\n\nBest regards,\nSarah Jenkins",
+    "expected_category": "general",
+    "expected_difficulty": "hard",
+    "notes": "Extremely long multi-paragraph general inquiry from a community organization coordinator requesting informational materials."
+  }
+]

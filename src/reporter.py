@@ -1,0 +1,488 @@
+import os
+from jinja2 import Template
+from src.contracts import RunSummary, EvalResult
+
+def generate_report(
+    run_summary: RunSummary,
+    delta: dict,
+    results: list[EvalResult],
+    output_path: str
+) -> None:
+    # Ensure directory exists
+    directory = os.path.dirname(output_path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+
+    status = delta.get("status", "pass").lower()
+    if status == "pass":
+        badge_color = "#10b981"  # Emerald Green
+        status_label = "PASS"
+    elif status == "warn":
+        badge_color = "#f59e0b"  # Amber Orange
+        status_label = "WARNING"
+    else:
+        badge_color = "#ef4444"  # Crimson Red
+        status_label = "FAIL"
+
+    # HTML/CSS template inline
+    template_str = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Regression Report - {{ run_summary.run_id }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(20, 28, 47, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --glow-color: {{ badge_color }};
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(30, 41, 59, 0.5) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.8) 0px, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header section */
+        header {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--glow-color);
+            box-shadow: 0 2px 20px var(--glow-color);
+        }
+
+        .header-info h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 30%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-meta {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .meta-item strong {
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            background: rgba({{ "16, 185, 129" if status == "pass" else "245, 158, 11" if status == "warn" else "239, 68, 68" }}, 0.15);
+            border: 1px solid var(--glow-color);
+            color: var(--glow-color);
+            box-shadow: 0 0 15px rgba({{ "16, 185, 129" if status == "pass" else "245, 158, 11" if status == "warn" else "239, 68, 68" }}, 0.2);
+            padding: 0.6rem 1.5rem;
+            border-radius: 99px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 5px rgba({{ "16, 185, 129" if status == "pass" else "245, 158, 11" if status == "warn" else "239, 68, 68" }}, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Scorecard Section */
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .score-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.8rem;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .score-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .score-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.4rem;
+        }
+
+        .score-card.pass .score-val { color: var(--accent-green); }
+        .score-card.warn .score-val { color: var(--accent-orange); }
+        .score-card.fail .score-val { color: var(--accent-red); }
+
+        .score-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Table & Section styles */
+        .section-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .case-id {
+            font-family: monospace;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .category-badge {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            color: var(--text-primary);
+        }
+
+        /* Diff comparison container */
+        .diff-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .diff-box {
+            background: rgba(10, 15, 25, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem;
+        }
+
+        .diff-box.old {
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .diff-box.new {
+            border-left: 3px solid var(--accent-red);
+        }
+
+        .diff-header {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.05em;
+        }
+
+        .diff-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .diff-category {
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Trend chart mockup */
+        .trend-mockup {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .trend-mockup svg {
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .trend-placeholder-text {
+            color: var(--text-secondary);
+            font-weight: 600;
+            z-index: 10;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 1rem;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            background: rgba(10, 15, 25, 0.3);
+        }
+
+        .footer-item strong {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+            .diff-container {
+                grid-template-columns: 1fr;
+            }
+            footer {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-info">
+                <h1>LLM Classifier Regression Evaluation</h1>
+                <div class="header-meta">
+                    <span class="meta-item">Run ID: <strong>{{ run_summary.run_id }}</strong></span>
+                    <span class="meta-item">Model: <strong>{{ run_summary.model }}</strong></span>
+                    <span class="meta-item">Prompt Version: <strong>{{ run_summary.prompt_version }}</strong></span>
+                    <span class="meta-item">Timestamp: <strong>{{ run_summary.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</strong></span>
+                </div>
+            </div>
+            <div class="status-badge">{{ status_label }}</div>
+        </header>
+
+        <!-- Scorecard -->
+        <div class="scorecard-grid">
+            <div class="score-card">
+                <div class="score-val">{{ (run_summary.accuracy * 100) | round(2) }}%</div>
+                <div class="score-label">Current Accuracy</div>
+            </div>
+            <div class="score-card">
+                <div class="score-val">{{ ((run_summary.accuracy * 100) - delta.accuracy_delta) | round(2) }}%</div>
+                <div class="score-label">Baseline Accuracy</div>
+            </div>
+            <div class="score-card {{ 'pass' if delta.accuracy_delta >= 0 else 'fail' }}">
+                <div class="score-val">{{ '+' if delta.accuracy_delta >= 0 else '' }}{{ delta.accuracy_delta }}%</div>
+                <div class="score-label">Accuracy Delta</div>
+            </div>
+            <div class="score-card {{ 'pass' if delta.regressions_count == 0 else 'fail' }}">
+                <div class="score-val">{{ delta.regressions_count }}</div>
+                <div class="score-label">Regressions Detected</div>
+            </div>
+        </div>
+
+        <!-- Regressions Section -->
+        <div class="section-container">
+            <div class="section-title">
+                <span>⚠️</span> Regressed Cases Details ({{ delta.regressions_count }})
+            </div>
+            
+            {% if delta.regressions_count > 0 %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">Case ID / Expected</th>
+                            <th style="width: 80%;">Output Diff (Baseline vs Current)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case in delta.regressed_cases %}
+                        <tr>
+                            <td>
+                                <div class="case-id" style="margin-bottom: 0.5rem; display: inline-block;">{{ case.id }}</div>
+                                <br>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary);">Expected:</span>
+                                <span class="category-badge">{{ case.expected_category }}</span>
+                            </td>
+                            <td>
+                                <div class="diff-container">
+                                    <div class="diff-box old">
+                                        <div class="diff-header">Baseline Output</div>
+                                        <div class="diff-content"><span class="diff-category" style="color: var(--accent-orange);">Category: {{ case.baseline_output.category if case.baseline_output else 'N/A' }}</span>
+{{ case.baseline_output.summary if case.baseline_output else 'N/A' }}</div>
+                                    </div>
+                                    <div class="diff-box new">
+                                        <div class="diff-header">Current Output</div>
+                                        <div class="diff-content"><span class="diff-category" style="color: var(--accent-red);">Category: {{ case.current_output.category if case.current_output else 'N/A' }}</span>
+{{ case.current_output.summary if case.current_output else 'N/A' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; color: var(--text-secondary); padding: 2rem 0;">
+                🎉 Excellent! No regression detected compared to the baseline.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Trend Section Placeholder -->
+        <div class="section-container">
+            <div class="section-title">
+                <span>📈</span> Performance Trends
+            </div>
+            <div class="trend-mockup">
+                <svg viewBox="0 0 1000 180" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"></stop>
+                            <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"></stop>
+                        </linearGradient>
+                    </defs>
+                    <path d="M0 140 Q 150 120, 300 90 T 600 110 T 900 60 L 1000 50 L 1000 180 L 0 180 Z" fill="url(#chartGrad)"></path>
+                    <path d="M0 140 Q 150 120, 300 90 T 600 110 T 900 60 L 1000 50" fill="none" stroke="#10b981" stroke-width="3"></path>
+                </svg>
+                <div class="trend-placeholder-text">Trend Graph Analytics (Coming Soon)</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-item">Total Tokens Used: <strong>{{ run_summary.total_tokens }}</strong></div>
+            <div class="footer-item">Average Latency: <strong>{{ run_summary.avg_latency | round(3) }}s</strong></div>
+            <div class="footer-item">Branch Tag: <strong>{{ run_summary.branch }}</strong></div>
+        </footer>
+    </div>
+</body>
+</html>"""
+
+    # Render template
+    template = Template(template_str)
+    rendered_html = template.render(
+        run_summary=run_summary,
+        delta=delta,
+        badge_color=badge_color,
+        status_label=status_label,
+        status=status
+    )
+
+    # Save to file
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(rendered_html)
+
+    print(f"Report saved to {output_path}")
