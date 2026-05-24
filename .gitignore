@@ -1,71 +1,42 @@
-# =============================================================================
-# SECRETS — never commit these
-# =============================================================================
-.env
-*.env.local
-*.env.*.local
-
-# =============================================================================
-# Python
-# =============================================================================
-__pycache__/
-*.py[cod]
-*$py.class
-*.pyo
-*.pyd
-.Python
-
-# Virtual environments
+# Virtual Environment
 .venv/
 venv/
-env/
-ENV/
 
-# Distribution / packaging
-dist/
+# Environment Variables
+.env
+.env.*
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Build files
 build/
+dist/
 *.egg-info/
-*.egg
-.eggs/
 
-# =============================================================================
-# Testing & Coverage
-# =============================================================================
-.pytest_cache/
-.coverage
-htmlcov/
-*.xml
-coverage.xml
-.tox/
+# Logs
+*.log
 
-# =============================================================================
-# Generated outputs (keep reports/ tracked so CI artifacts are visible,
-# but ignore actual HTML files — they are uploaded as GHA artifacts)
-# =============================================================================
-reports/*.html
-
-# Run log and run data (generated at runtime, not source code)
-data/runs/
-data/run_log.jsonl
-
-# =============================================================================
-# deepeval cache
-# =============================================================================
-.deepeval/
-
-# =============================================================================
-# IDE & OS
-# =============================================================================
+# IDE files
 .vscode/
 .idea/
-*.iml
+
+# OS files
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# =============================================================================
-# Misc
-# =============================================================================
-*.log
-*.tmp
-*.bak
+# Data / Models
+data/
+models/
+*.pkl
+*.joblib
+*.csv
+
+# Streamlit
+.streamlit/secrets.toml
