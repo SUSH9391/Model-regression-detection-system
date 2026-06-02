@@ -1,0 +1,880 @@
+/* =====================================================
+   PORTFOLIO — Global Stylesheet
+   ===================================================== */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Arizonia&family=Barlow+Condensed:wght@400;500;700&family=DM+Sans:wght@300;400;500;700&display=swap');
+
+/* ── Reset & Base ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #fff;
+  background: linear-gradient(0deg, #000, #001d00, #000);
+  background-size: 400% 400%;
+  animation: gradient 5s ease infinite;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+img { display: block; max-width: 100%; }
+
+/* ── Keyframes ─────────────────────────────────────── */
+@keyframes gradient {
+  0%   { background-position: 0% 0%; }
+  25%  { background-position: 100% 50%; }
+  50%  { background-position: 0% 50%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes bounceInBottom {
+  0%   { transform: translate3d(0, 300%, 0); opacity: 0; }
+  58%  { transform: translate3d(0, -27px, 0); opacity: 1; }
+  73%  { transform: translate3d(0, 12px, 0); }
+  88%  { transform: translate3d(0, -8px, 0); }
+  100% { transform: translateZ(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Root / Page Layout ────────────────────────────── */
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+#pageSetup {
+  width: 1260px;
+  max-width: 100%;
+}
+
+@media (max-width: 1300px) {
+  #pageSetup { width: 90%; }
+}
+
+@media (max-width: 768px) {
+  #pageSetup { width: 100%; }
+}
+
+/* ── Pill Button (shared) ──────────────────────────── */
+.pillBtn {
+  background: #fff;
+  color: #000;
+  border: 2px solid #fff;
+  border-radius: 20px;
+  padding: 8px 22px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+  display: inline-block;
+}
+
+.pillBtn:hover {
+  background: #1cac78;
+  color: #fff;
+  border-color: #1cac78;
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+.headerComp {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 18px 0;
+}
+
+.headerInner {
+  width: 90%;
+  max-width: 1260px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Hamburger */
+.main-item.menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 36px;
+  height: 22px;
+  cursor: pointer;
+  z-index: 200;
+  position: relative;
+}
+
+.line {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: #fff;
+  border-radius: 3px;
+  transition: transform 0.32s cubic-bezier(0.25, 0.1, 0.28, 1.54),
+              opacity  0.32s cubic-bezier(0.25, 0.1, 0.28, 1.54),
+              top      0.32s cubic-bezier(0.25, 0.1, 0.28, 1.54);
+  position: relative;
+  top: 0;
+}
+
+/* Close (X) state */
+.menu.close .line01 {
+  transform: rotate(45deg);
+  top: 49%;
+  position: absolute;
+}
+
+.menu.close .line02 {
+  transform: rotate(-45deg);
+  top: 49%;
+  position: absolute;
+}
+
+.menu.close .line03 {
+  opacity: 0;
+}
+
+/* Logo */
+.logoLink {
+  text-decoration: none;
+}
+
+.logoTitle {
+  font-family: 'Arizonia', cursive;
+  font-size: 3.5rem;
+  color: #fff;
+  font-weight: 400;
+  line-height: 1;
+  transition: opacity 0.25s;
+}
+
+.logoTitle:hover { opacity: 0.4; }
+
+/* ── Full-screen Nav Overlay ───────────────────────── */
+.openNavDesk {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 0%;
+  background: #000;
+  z-index: 9;
+  overflow: hidden;
+  transition: width 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.openNavDesk.showNavDesktop {
+  width: 100%;
+}
+
+.navList {
+  list-style: none;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.openNavDesk.showNavDesktop .navList {
+  opacity: 1;
+}
+
+.navList li {
+  margin: 20px 0;
+}
+
+.navList li a {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 3vw;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.navList li a:hover { color: #1cac78; }
+
+/* close button inside nav */
+.navCloseBtn {
+  position: absolute;
+  top: 24px;
+  right: 30px;
+  font-size: 2.5rem;
+  cursor: pointer;
+  color: #fff;
+  z-index: 10;
+  transition: color 0.2s;
+}
+.navCloseBtn:hover { color: #1cac78; }
+
+/* =====================================================
+   HOME PAGE
+   ===================================================== */
+
+/* ── Landing Face ──────────────────────────────────── */
+.landingPageFace {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding-top: 20px;
+  min-height: 70vh;
+}
+
+.leftOfFace {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bigTitle {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13rem;
+  font-weight: 500;
+  line-height: 0.9;
+  text-transform: uppercase;
+  display: flex;
+  overflow: hidden;
+}
+
+.letterAnimation {
+  display: inline-block;
+  animation: bounceInBottom 1.2s ease-out both;
+}
+
+/* Profile container */
+.profileContainer {
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  animation: bounceInBottom 2s ease-out both;
+}
+
+.profileImg {
+  width: 100%;
+  border-radius: 100px;
+  object-fit: cover;
+  aspect-ratio: 1 / 1.1;
+}
+
+/* ── About Me ──────────────────────────────────────── */
+.landingPageContainer {
+  width: 90%;
+  margin: 80px auto;
+  text-align: center;
+}
+
+.landingPageContainer h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 4rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.landingPageContainer p {
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #e0e0e0;
+}
+
+/* ── Featured Projects ─────────────────────────────── */
+.featuredProjects {
+  width: 90%;
+  margin: 0 auto 100px;
+}
+
+.featuredProjects > h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 4rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.projectsContainer {
+  display: flex;
+  flex-direction: row;
+  column-gap: 15px;
+  height: 350px;
+  align-items: center;
+}
+
+.featuredProjectCard {
+  flex: 1;
+  height: 300px;
+  border-radius: 30px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: flex 0.35s ease-in-out, height 0.35s ease-in-out;
+}
+
+.featuredProjectCard:hover {
+  flex: 1.8;
+  height: 370px;
+}
+
+.featuredProjectCard img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.backgroundDim {
+  position: absolute;
+  inset: 0;
+  background: #0000007a;
+  transition: background 0.35s ease-in-out;
+  border-radius: 30px;
+}
+
+.featuredProjectCard:hover .backgroundDim {
+  background: transparent;
+}
+
+.featuredCardContent {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1;
+}
+
+.featuredCardContent h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.featuredCardContent p {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+/* =====================================================
+   RESUME PAGE
+   ===================================================== */
+.resumePage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto;
+  padding-bottom: 100px;
+  position: relative;
+}
+
+.resumePage > h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin-bottom: 60px;
+}
+
+.resumePage > h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 4rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 40px;
+  align-self: flex-start;
+}
+
+.middleLine {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: #fff;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.jobContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 60px;
+}
+
+/* ── Job Tile ──────────────────────────────────────── */
+.jobTile {
+  width: 400px;
+  background: #ffffff4d;
+  border-radius: 20px;
+  padding: 20px;
+  max-height: 6rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: max-height 0.45s ease, background 0.25s;
+  opacity: 0;
+}
+
+.jobTile:hover { background: #0080004d; }
+
+.jobTile.animateJob {
+  animation: slideUp 0.6s ease forwards;
+}
+
+.jobTile.openHeight {
+  max-height: 400px;
+}
+
+.jobTile.rightShift { transform: translateX(220px); }
+.jobTile.leftShift  { transform: translateX(-220px); }
+
+.topRes {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.topRes h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  width: 70%;
+  line-height: 1.2;
+}
+
+.topRes span {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  width: 25%;
+  text-align: right;
+}
+
+.jobTile h2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+  color: #1cac78;
+}
+
+.jobTile p {
+  font-size: 1.1rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+@media (min-width: 767px) and (max-width: 956px) {
+  .jobTile.rightShift { transform: translateX(120px); }
+  .jobTile.leftShift  { transform: translateX(-120px); }
+}
+
+@media (max-width: 767px) {
+  .jobTile.rightShift,
+  .jobTile.leftShift { transform: none; }
+  .jobTile { width: 100%; }
+}
+
+/* =====================================================
+   PROJECTS PAGE
+   ===================================================== */
+.projectsPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto;
+  padding-bottom: 100px;
+}
+
+.projectsPage > h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin-bottom: 60px;
+  align-self: flex-start;
+}
+
+.projectsContainerPage {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48%, 1fr));
+  grid-auto-rows: minmax(450px, auto);
+  gap: 20px;
+  width: 107%;
+}
+
+/* ── Project Tile ──────────────────────────────────── */
+.projectPageTileComp {
+  background: #0009;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0;
+  transition: transform 0.3s ease;
+}
+
+.projectPageTileComp:hover { transform: scale(1.01); }
+
+.projectPageTileComp.listAnimate {
+  animation: slideUp 0.6s ease forwards;
+}
+
+.projectPageTileComp img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -5;
+}
+
+.projectPageTileComp > h1 {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  text-shadow: 0 2px 20px #000a;
+  z-index: 2;
+}
+
+/* Top-right icon row */
+.openingBottom {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.iconBtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+  text-decoration: none;
+  transition: background 0.25s;
+  border: 1px solid #fff2;
+}
+
+.iconBtn:hover { background: #025002; }
+
+/* Click overlay */
+.onclickTile {
+  position: absolute;
+  inset: 0;
+  background: #010f01f0;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.45s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 30px;
+  z-index: 3;
+}
+
+.onclickTile.openClick {
+  height: 100%;
+}
+
+.onclickTile h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.onclickTile ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+
+.onclickTile ul li {
+  font-size: 1.2rem;
+  font-weight: 200;
+  margin-bottom: 6px;
+  color: #c8f7c5;
+}
+
+.onclickTile p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+/* =====================================================
+   CONTACT PAGE
+   ===================================================== */
+.contactPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto;
+  padding-bottom: 100px;
+}
+
+.contactPage > h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin-bottom: 20px;
+  align-self: flex-start;
+}
+
+.contactForm {
+  display: flex;
+  flex-direction: row;
+  gap: 5%;
+  margin-top: 100px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.leftContact {
+  width: 55%;
+}
+
+.leftContact h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 7rem;
+  font-weight: 500;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rightForm {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup h3 {
+  font-size: 1.7rem;
+  font-weight: 300;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.formGroup input,
+.formGroup textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #fff;
+  outline: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 15px 15px 15px 0;
+  width: 100%;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: #dad4d4;
+}
+
+.formGroup textarea {
+  height: 100px;
+  resize: none;
+}
+
+.submitBtn {
+  background: #fff;
+  color: #000;
+  border: 2px solid #fff;
+  border-radius: 30px;
+  font-size: 1.6rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  padding: 12px 36px;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+  align-self: flex-start;
+}
+
+.submitBtn:hover {
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+}
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+.footerComp {
+  width: 250px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px 0 60px;
+}
+
+.footerIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #ffffff15;
+  border: 1px solid #fff3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+
+.footerIcon:hover {
+  background: #1cac78;
+  border-color: #1cac78;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+/* Tablet */
+@media (max-width: 1030px) {
+  .bigTitle { font-size: 10rem; }
+}
+
+/* Mobile ≤ 768px */
+@media (max-width: 768px) {
+
+  /* Header — logo first, hamburger second, hide Connect */
+  .headerInner {
+    flex-direction: row;
+  }
+
+  .connectBtn { display: none; }
+
+  /* Landing */
+  .landingPageFace {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+  }
+
+  .leftOfFace { order: 2; }
+  .profileContainer { width: 70%; order: 1; margin-bottom: 20px; }
+
+  .bigTitle { font-size: 4.5rem; }
+
+  /* About */
+  .landingPageContainer p { font-size: 1.1rem; }
+
+  /* Featured cards — stack */
+  .projectsContainer {
+    flex-direction: column;
+    height: auto;
+    gap: 15px;
+  }
+
+  .featuredProjectCard {
+    width: 100%;
+    height: 50vh;
+    flex: none;
+  }
+
+  .featuredProjectCard:hover {
+    flex: none;
+    height: 50vh;
+  }
+
+  /* Resume */
+  .resumePage > h1 { font-size: 6rem; }
+
+  /* Big titles on pages */
+  .projectsPage > h1,
+  .contactPage > h1 { font-size: 6rem; }
+
+  .leftContact h2 { font-size: 9.7vw; }
+
+  /* Projects grid */
+  .projectsContainerPage {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  /* Contact */
+  .contactForm {
+    flex-direction: column;
+    margin-top: 40px;
+  }
+
+  .leftContact,
+  .rightForm { width: 100%; }
+
+  /* Nav items font */
+  .navList li a { font-size: 4rem; }
+}
